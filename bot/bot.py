@@ -1,9 +1,11 @@
 from auth_data import token
 import asyncio
 from vkbottle.bot import Bot, Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API
+from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API, PhotoMessageUploader
 
 bot = Bot(token = token)
+
+photo_upd = PhotoMessageUploader(bot.api)
 
 @bot.on.message(text = 'Начать')
 @bot.on.message(payload = {'cmd': 'menu'})
@@ -32,20 +34,28 @@ async def keyboard_timetable(message: Message):
 	await message.answer('.', keyboard = keyboard_timetable)
 
 @bot.on.message(payload = {'cmd': 'kurs1'})
-async def answerer(message: Message):
-	await message.answer('Расписание для первого курса')
+async def answerer_kurs1(message: Message):
+	photo = await photo_upd.upload('KURS1.jpg')
+	photo1 = await photo_upd.upload('KURS1_1.jpg')
+	await message.answer(attachment = [photo, photo1])
 
 @bot.on.message(payload = {'cmd': 'kurs2'})
-async def answerer(message: Message):
-	await message.answer('Расписание для второго курса')
+async def answerer_kurs2(message: Message):
+	photo = await photo_upd.upload('KURS2.jpg')
+	photo1 = await photo_upd.upload('KURS2_1.jpg')
+	await message.answer(attachment = [photo, photo1])
 
 @bot.on.message(payload = {'cmd': 'kurs3'})
-async def answerer(message: Message):
-	await message.answer('Расписание для третьего курса')
+async def answerer_kurs3(message: Message):
+	photo = await photo_upd.upload('KURS3.jpg')
+	photo1 = await photo_upd.upload('KURS3_1.jpg')
+	await message.answer(attachment = [photo, photo1])
 
 @bot.on.message(payload = {'cmd': 'kurs4'})
-async def answerer(message: Message):
-	await message.answer('Расписание для четвёртого курса')
+async def answerer_kurs4(message: Message):
+	photo = await photo_upd.upload('KURS4.jpg')
+	photo1 = await photo_upd.upload('KURS4_1.jpg')
+	await message.answer(attachment = [photo, photo1])
 
 @bot.on.message(text = 'Помощь')
 @bot.on.message(payload = {'cmd': 'help'})
