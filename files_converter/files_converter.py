@@ -35,7 +35,7 @@ for file in xls_files:
 	#создание класса Chrome(), можно использовать другие браузеры, но придётся поменять код
 	#в executable_path нужно указать путь к вашему chrome драйверу
 	driver = webdriver.Chrome(
-		executable_path = 'K:\\python\\python\\selenium\\chromedriver\\chromedriver.exe',
+		executable_path = 'chromedriver\\chromedriver.exe',
 		options = options,
 	)
 
@@ -92,7 +92,7 @@ for file in pdf_files:
 	#создание класса Chrome(), можно использовать другие браузеры, но придётся поменять код
 	#в executable_path нужно указать путь к вашему chrome драйверу
 	driver = webdriver.Chrome(
-		executable_path = 'K:\\python\\python\\selenium\\chromedriver\\chromedriver.exe',
+		executable_path = 'chromedriver\\chromedriver.exe',
 		options = options,
 	)
 

@@ -23,7 +23,7 @@ options.add_argument('--disable-blink-features=AutomationControlled')
 
 #создание класса Chrome(), можно использовать другие браузеры, но придётся поменять код
 driver = webdriver.Chrome(
-	executable_path = 'K:\\python\\python\\selenium\\chromedriver\\chromedriver.exe',
+	executable_path = 'chromedriver\\chromedriver.exe',
 	options = options
 )
 
