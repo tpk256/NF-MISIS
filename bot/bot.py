@@ -1,23 +1,36 @@
 from auth_data import token
-import asyncio
+import asyncio, glob
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API, PhotoMessageUploader
+from mailing_db import *
 
+#авторизация
 bot = Bot(token = token)
 
+#для загрузки фото
 photo_upd = PhotoMessageUploader(bot.api)
 
+#ответ на нажатие кнопки "Начать", создание клавиатуры и пейлоад меню
 @bot.on.message(text = 'Начать')
 @bot.on.message(payload = {'cmd': 'menu'})
 async def keyboard_menu(message: Message):
+	#получаю id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю пользователя в бд
+	upload_user(user_id)
 	#Меню
 	keyboard_menu = Keyboard()
 	keyboard_menu.add(Text('Расписание', {'cmd': 'timetable'}))
 	keyboard_menu.add(Text('Помощь', {'cmd': 'help'}))
+	keyboard_menu.row()
+	keyboard_menu.add(Text('Рассылка', {'cmd': 'mailing'}))
+	keyboard_menu.add(Text('Авторы', {'cmd': 'author'}))
 	keyboard_menu = keyboard_menu.get_json()
 
-	await message.answer('.', keyboard = keyboard_menu)
+	await message.answer('Меню', keyboard = keyboard_menu)
 
+#ответ на нажатие на кнопку "Расписание"
 @bot.on.message(payload = {'cmd': 'timetable'})
 async def keyboard_timetable(message: Message):
 	#расписание
@@ -31,35 +44,218 @@ async def keyboard_timetable(message: Message):
 	keyboard_timetable.add(Text('Назад', {'cmd': 'menu'}), color = KeyboardButtonColor.PRIMARY)
 	keyboard_timetable = keyboard_timetable.get_json()
 
-	await message.answer('.', keyboard = keyboard_timetable)
+	await message.answer('Выберите курс', keyboard = keyboard_timetable)
 
+#ответ на нажатие на кнопку "рассылка"
+@bot.on.message(payload = {'cmd': 'mailing'})
+async def mailing_menu(message = Message):
+	#создаю клавиатуру
+	mailing_menu_keyboard = Keyboard()
+	mailing_menu_keyboard.add(Text('Подписаться', {'cmd': 'mailing_subscribe'}))
+	mailing_menu_keyboard.add(Text('Отписаться', {'cmd': 'mailing_unsubscribe'}))
+	mailing_menu_keyboard.row()
+	mailing_menu_keyboard.add(Text('Назад', {'cmd': 'menu'}), color = KeyboardButtonColor.PRIMARY)
+
+	await message.answer('Вы хотите подписаться на рассылку или отписаться от рассылки?', keyboard = mailing_menu_keyboard)
+
+#ответ на нажатие на кнопку "подписаться"
+@bot.on.message(payload = {'cmd': 'mailing_subscribe'})
+async def mailing_handler(message = Message):
+	#создаю клавиатуру
+	mailing_keyboard_sub = Keyboard()
+	mailing_keyboard_sub.add(Text('1 курс', {'cmd': 'kurs1_mailing_sub'}))
+	mailing_keyboard_sub.add(Text('2 курс', {'cmd': 'kurs2_mailing_sub'}))
+	mailing_keyboard_sub.row()
+	mailing_keyboard_sub.add(Text('3 курс', {'cmd': 'kurs3_mailing_sub'}))
+	mailing_keyboard_sub.add(Text('4 курс', {'cmd': 'kurs4_mailing_sub'}))
+	mailing_keyboard_sub.row()
+	mailing_keyboard_sub.add(Text('Назад', {'cmd': 'mailing'}), color = KeyboardButtonColor.PRIMARY)
+
+	await message.answer('Нажмите на курс, на рассылку которого хотите подписаться', keyboard = mailing_keyboard_sub)
+
+#ответ на нажатие на кнопку "отписаться"
+@bot.on.message(payload = {'cmd': 'mailing_unsubscribe'})
+async def mailing_handler(message = Message):
+	#создаю клавиатуру
+	mailing_keyboard_unsub = Keyboard()
+	mailing_keyboard_unsub.add(Text('1 курс', {'cmd': 'kurs1_mailing_unsub'}))
+	mailing_keyboard_unsub.add(Text('2 курс', {'cmd': 'kurs2_mailing_unsub'}))
+	mailing_keyboard_unsub.row()
+	mailing_keyboard_unsub.add(Text('3 курс', {'cmd': 'kurs3_mailing_unsub'}))
+	mailing_keyboard_unsub.add(Text('4 курс', {'cmd': 'kurs4_mailing_unsub'}))
+	mailing_keyboard_unsub.row()
+	mailing_keyboard_unsub.add(Text('Назад', {'cmd': 'mailing'}), color = KeyboardButtonColor.PRIMARY)
+
+	await message.answer('Нажмите на курс, на от рассылку которого хотите отписаться', keyboard = mailing_keyboard_unsub)
+
+
+
+#ответ на нажатие на кнопку подписки на рассылку первого курса
+@bot.on.message(payload = {'cmd': 'kurs1_mailing_sub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic1'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на первый курс пользователю
+	message_answer = update_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку подписки на рассылку второго курса
+@bot.on.message(payload = {'cmd': 'kurs2_mailing_sub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic2'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на второй курс пользователю
+	message_answer = update_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку подписки на рассылку тертьего курса
+@bot.on.message(payload = {'cmd': 'kurs3_mailing_sub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic3'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на третий курс пользователю
+	message_answer = update_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку подписки на рассылку четвёртого курса
+@bot.on.message(payload = {'cmd': 'kurs4_mailing_sub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic4'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на четвёртый курс пользователю
+	message_answer = update_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+
+
+#ответ на нажатие на кнопку отписки на рассылку первого курса
+@bot.on.message(payload = {'cmd': 'kurs1_mailing_unsub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic1'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на первый курс пользователю
+	message_answer = delete_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку отписки на рассылку второго курса
+@bot.on.message(payload = {'cmd': 'kurs2_mailing_unsub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic2'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на второй курс пользователю
+	message_answer = delete_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку отписки на рассылку тертьего курса
+@bot.on.message(payload = {'cmd': 'kurs3_mailing_unsub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic3'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на третий курс пользователю
+	message_answer = delete_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+#ответ на нажатие на кнопку отписки на рассылку четвёртого курса
+@bot.on.message(payload = {'cmd': 'kurs4_mailing_unsub'})
+async def kurs1_mailing_handler(message = Message):
+	topic = 'topic4'
+	#нахожу id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	#добавляю подписку на четвёртый курс пользователю
+	message_answer = delete_user_topics(user_id = user_id, topic = topic)
+	await message.answer(f'{message_answer}')
+
+
+
+#ответ на нажатие на кнопку "авторы"
+@bot.on.message(payload = {'cmd': 'author'})
+async def author(message: Message):
+	await message.answer('Авторы: [vladik.kravchenko|Влад Кравченко] и [xpestilent|Миша Ермаков]. \n Авторы старого бота: [val_kd|Валентин Казанцев] и [vladdd183|Влад Сухов]')
+
+#ответ на нажатие на кнопку "курс 1"
 @bot.on.message(payload = {'cmd': 'kurs1'})
 async def answerer_kurs1(message: Message):
-	photo = await photo_upd.upload('KURS1.jpg')
-	photo1 = await photo_upd.upload('KURS1_1.jpg')
-	await message.answer(attachment = [photo, photo1])
+	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	kurs1 = []
+	for file in files:
+		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS1':
+			kurs1.append(file)
+	kurs_dict = {}
+	photos = []
+	for i in range(len(kurs1)):
+		kurs_dict[i] = await photo_upd.upload(f'{kurs1[i]}')
+	for i in range(len(kurs1)):	
+		photos.append(kurs_dict[i])
+	await message.answer(attachment = photos)
 
+#ответ на нажатие на кнопку "курс 2"
 @bot.on.message(payload = {'cmd': 'kurs2'})
 async def answerer_kurs2(message: Message):
-	photo = await photo_upd.upload('KURS2.jpg')
-	photo1 = await photo_upd.upload('KURS2_1.jpg')
-	await message.answer(attachment = [photo, photo1])
+	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	kurs2 = []
+	for file in files:
+		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS2':
+			kurs2.append(file)
+	kurs_dict = {}
+	photos = []
+	for i in range(len(kurs2)):
+		kurs_dict[i] = await photo_upd.upload(f'{kurs2[i]}')
+	for i in range(len(kurs2)):	
+		photos.append(kurs_dict[i])
+	await message.answer(attachment = photos)
 
+#ответ на нажатие на кнопку "курс 3"
 @bot.on.message(payload = {'cmd': 'kurs3'})
 async def answerer_kurs3(message: Message):
-	photo = await photo_upd.upload('KURS3.jpg')
-	photo1 = await photo_upd.upload('KURS3_1.jpg')
-	await message.answer(attachment = [photo, photo1])
+	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	kurs3 = []
+	for file in files:
+		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS3':
+			kurs3.append(file)
+	kurs_dict = {}
+	photos = []
+	for i in range(len(kurs3)):
+		kurs_dict[i] = await photo_upd.upload(f'{kurs3[i]}')
+	for i in range(len(kurs3)):	
+		photos.append(kurs_dict[i])
+	await message.answer(attachment = photos)
 
+#ответ на нажатие на кнопку "курс 4"
 @bot.on.message(payload = {'cmd': 'kurs4'})
 async def answerer_kurs4(message: Message):
-	photo = await photo_upd.upload('KURS4.jpg')
-	photo1 = await photo_upd.upload('KURS4_1.jpg')
-	await message.answer(attachment = [photo, photo1])
+	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	kurs4 = []
+	for file in files:
+		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS4':
+			kurs4.append(file)
+	kurs_dict = {}
+	photos = []
+	for i in range(len(kurs4)):
+		kurs_dict[i] = await photo_upd.upload(f'{kurs4[i]}')
+	for i in range(len(kurs4)):	
+		photos.append(kurs_dict[i])
+	await message.answer(attachment = photos)
 
+#ответ на нажатие на кнопку "Помощь"
 @bot.on.message(text = 'Помощь')
 @bot.on.message(payload = {'cmd': 'help'})
 async def help(message: Message):
-	await message.answer('Если возникли проблемы, обратитесь к @vladik.kravchenko или @xpestilent')
+	await message.answer('Если возникли проблемы, обратитесь к [vladik.kravchenko|Владу Кравченко] или [xpestilent|Мише Ермакову]')
 
+#запуск бота
 bot.run_forever()
