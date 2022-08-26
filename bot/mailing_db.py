@@ -1,4 +1,5 @@
 import sqlite3 as sql
+import glob
 
 TOPIC_TRANSLATOR = {
 		'topic1': 'первого',
@@ -85,9 +86,10 @@ def update_user_topics(user_id, topic):
 		topics_finally = topics_finally.lstrip(';')
 		data = (topics_finally, user_id)
 		cursor.execute(update_request, data)
+		con.commit()
 		#информация о курсах, на которые подписан user
 		user_topics_check = fetch_topics(user_id)
-		if len(user_topics_check) > 0:
+		if user_topics_check != ['']:
 			message += ' Теперь вы подписаны на рассылку'
 			topics = topics_finally.split(';')[:-1]
 			for i in range(len(topics_finally[:-1].split(';'))):
@@ -96,8 +98,7 @@ def update_user_topics(user_id, topic):
 					break
 				message += f' {TOPIC_TRANSLATOR[topics[i]]},'
 		else:
-			message += '. Теперь вы не подписаны ни на одну рассылку'
-		con.commit()
+			message += ' Теперь вы не подписаны ни на одну рассылку.'
 		cursor.close()
 	except Exception as ex:
 		print(f'Ошибка: {ex}')
@@ -135,7 +136,7 @@ def delete_user_topics(user_id, topic):
 		con.commit()
 		#информация о курсах, на которые подписан user
 		user_topics_check = fetch_topics(user_id)
-		if len(user_topics_check) > 0:
+		if user_topics_check != ['']:
 			message += '. Теперь вы подписаны на рассылку'
 			topics = topics_finally.split(';')[:-1]
 			for i in range(len(topics_finally[:-1].split(';'))):
@@ -186,3 +187,13 @@ def fetch_topics(user_id):
 		if user_id == record[0]:
 			topics.append(record[1])
 	return topics
+
+#функция-поиск файлов
+def file_finder(kurs_number, path):
+	files = glob.glob(path)
+	kurs = []
+	path2 = path.rstrip('*')
+	for file in files:
+		if file[len(path2):-4][:-4] == f'KURS{kurs_number}':
+			kurs.append(file)
+	return kurs

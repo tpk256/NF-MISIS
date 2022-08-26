@@ -2,13 +2,23 @@ from auth_data import token
 import asyncio, glob
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API, PhotoMessageUploader
+from typing import Tuple
 from mailing_db import *
+from photo_server_upload import *
+import random
 
 #авторизация
 bot = Bot(token = token)
 
 #для загрузки фото
 photo_upd = PhotoMessageUploader(bot.api)
+
+#подгрузка блупринтов(других файлов)
+#for bp in load_blueprints_from_package('blueprints'):
+#	bp.load(bot)
+
+#словарь с idшниками фото
+photos_db = fetch_photo_kurs()
 
 #ответ на нажатие кнопки "Начать", создание клавиатуры и пейлоад меню
 @bot.on.message(text = 'Начать')
@@ -185,77 +195,116 @@ async def kurs1_mailing_handler(message = Message):
 #ответ на нажатие на кнопку "авторы"
 @bot.on.message(payload = {'cmd': 'author'})
 async def author(message: Message):
-	await message.answer('Авторы: [vladik.kravchenko|Влад Кравченко] и [xpestilent|Миша Ермаков]. \n Авторы старого бота: [val_kd|Валентин Казанцев] и [vladdd183|Влад Сухов]')
+	await message.answer('Авторы: [vladik.kravchenko|Влад Кравченко]. \n Авторы старого бота: [val_kd|Валентин Казанцев] и [vladdd183|Влад Сухов]')
+
 
 #ответ на нажатие на кнопку "курс 1"
 @bot.on.message(payload = {'cmd': 'kurs1'})
 async def answerer_kurs1(message: Message):
-	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-	kurs1 = []
-	for file in files:
-		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS1':
-			kurs1.append(file)
-	kurs_dict = {}
-	photos = []
-	for i in range(len(kurs1)):
-		kurs_dict[i] = await photo_upd.upload(f'{kurs1[i]}')
-	for i in range(len(kurs1)):	
-		photos.append(kurs_dict[i])
+	photos = photos_db['1']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 2"
 @bot.on.message(payload = {'cmd': 'kurs2'})
 async def answerer_kurs2(message: Message):
-	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-	kurs2 = []
-	for file in files:
-		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS2':
-			kurs2.append(file)
-	kurs_dict = {}
-	photos = []
-	for i in range(len(kurs2)):
-		kurs_dict[i] = await photo_upd.upload(f'{kurs2[i]}')
-	for i in range(len(kurs2)):	
-		photos.append(kurs_dict[i])
+	photos = photos_db['2']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 3"
 @bot.on.message(payload = {'cmd': 'kurs3'})
 async def answerer_kurs3(message: Message):
-	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-	kurs3 = []
-	for file in files:
-		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS3':
-			kurs3.append(file)
-	kurs_dict = {}
-	photos = []
-	for i in range(len(kurs3)):
-		kurs_dict[i] = await photo_upd.upload(f'{kurs3[i]}')
-	for i in range(len(kurs3)):	
-		photos.append(kurs_dict[i])
+	photos = photos_db['3']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 4"
 @bot.on.message(payload = {'cmd': 'kurs4'})
 async def answerer_kurs4(message: Message):
-	files = glob.glob('C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-	kurs4 = []
-	for file in files:
-		if file[len('C:\\Users\\Vladik\\Downloads\\photo_files\\'):-4][:-4] == 'KURS4':
-			kurs4.append(file)
-	kurs_dict = {}
-	photos = []
-	for i in range(len(kurs4)):
-		kurs_dict[i] = await photo_upd.upload(f'{kurs4[i]}')
-	for i in range(len(kurs4)):	
-		photos.append(kurs_dict[i])
+	photos = photos_db['4']
 	await message.answer(attachment = photos)
+	#код ниже это бекап такой
+	#kurs4 = file_finder(4, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	#kurs_dict = {}
+	#photos = []
+	#for i in range(len(kurs4)):
+	#	kurs_dict[i] = await photo_upd.upload(f'{kurs4[i]}')
+	#for i in range(len(kurs4)):	
+	#	photos.append(kurs_dict[i])
+	#await message.answer(attachment = photos)
+
 
 #ответ на нажатие на кнопку "Помощь"
 @bot.on.message(text = 'Помощь')
 @bot.on.message(payload = {'cmd': 'help'})
 async def help(message: Message):
 	await message.answer('Если возникли проблемы, обратитесь к [vladik.kravchenko|Владу Кравченко] или [xpestilent|Мише Ермакову]')
+
+#рассылка
+@bot.on.message(text = '/mailing')
+async def mailing_handler(message: Message):
+	#кортеж топиков
+	topics = ('topic1;', 'topic2;', 'topic3;', 'topic4;')
+	#получаю id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	random_number = random.randint(1, 900000000)
+	if user_id == 188529333:
+		try:
+			#получаю информацию о пользователях, пользующихся ботом
+			users_info = fetchall()
+			#нахожу пользователей, подписанных на рассылку
+			users_with_topics = []
+			for user in users_info:
+				if len(user[1]) > 1 and user[1] != 'подписки':
+					users_with_topics.append(user)
+			for user in users_with_topics:
+				user_id = user[0]
+				user_topics = fetch_topics(user_id)
+				for user_topic in user_topics:
+					if user_topic == topics[0]:
+						photos = photos_db['1']
+						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
+					if user_topic == topics[1]:
+						photos = photos_db['2']
+						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
+					if user_topic == topics[2]:
+						photos = photos_db['3']
+						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
+					if user_topic == topics[3]:
+						photos = photos_db['4']
+						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)							
+		except Exception as ex:
+			print(f'\n\n\nОшибка: {ex}\n\n\n')
+	else:
+		await message.answer('У вас нет доступа к этой команде')
+
+#path = 'C:\\Users\\Vladik\\Downloads\\photo_files\\*'
+#поиск всех фото
+@bot.on.message(text = '/photos')
+async def photo_upload(message: Message):
+	#получаю id пользователя
+	user = await bot.api.users.get(message.from_id)
+	user_id = user[0].id
+	if user_id == 188529333:
+		kurs1 = file_finder(1, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+		kurs2 = file_finder(2, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+		kurs3 = file_finder(3, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+		kurs4 = file_finder(4, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+		kurses = [kurs1, kurs2, kurs3, kurs4]
+		kurs_dict = {}
+		photos = []
+		for kurs in kurses:
+			try:
+				kurs_number = kurses.index(kurs) + 1
+				for i in range(len(kurs)):
+					kurs_dict[i] = await photo_upd.upload(f'{kurs[i]}')
+				for i in range(len(kurs)):	
+					photos.append(kurs_dict[i])
+				upload_photo(photos, kurs_number)
+				await message.answer(f'Фото для курса {kurs_number} загружены на сервер.')
+			except Exception as ex:
+				print(f'Ошибка: {ex}')
+	else:
+		await message.answer('У вас нет доступа к этой команде')
 
 #запуск бота
 bot.run_forever()
