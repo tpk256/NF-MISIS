@@ -90,3 +90,17 @@ def upload_photo(photos, kurs_number):
 	finally:
 		if con:
 			con.close()
+
+def delete_photos():
+	try:
+		con = sql.connect('photos.db')
+		cursor = con.cursor()
+		delete_old_photos = '''DELETE FROM PHOTOS where kurs = ?'''
+		attachment = [(1,), (2,), (3,), (4,)]
+		cursor.executemany(delete_old_photos, attachment)
+		con.commit()
+	except Exception as ex:
+		print(f'Ошибка: {ex}')
+	finally:
+		if con:
+			con.close()

@@ -1,4 +1,4 @@
-from auth_data import token
+from auth_data import token, token_old
 import asyncio, glob
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API, PhotoMessageUploader
@@ -18,7 +18,7 @@ photo_upd = PhotoMessageUploader(bot.api)
 #	bp.load(bot)
 
 #словарь с idшниками фото
-photos_db = fetch_photo_kurs()
+#photos_db = fetch_photo_kurs()
 
 #ответ на нажатие кнопки "Начать", создание клавиатуры и пейлоад меню
 @bot.on.message(text = 'Начать')
@@ -201,24 +201,32 @@ async def author(message: Message):
 #ответ на нажатие на кнопку "курс 1"
 @bot.on.message(payload = {'cmd': 'kurs1'})
 async def answerer_kurs1(message: Message):
+	#словарь с idшниками фото
+	photos_db = fetch_photo_kurs()
 	photos = photos_db['1']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 2"
 @bot.on.message(payload = {'cmd': 'kurs2'})
 async def answerer_kurs2(message: Message):
+	#словарь с idшниками фото
+	photos_db = fetch_photo_kurs()
 	photos = photos_db['2']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 3"
 @bot.on.message(payload = {'cmd': 'kurs3'})
 async def answerer_kurs3(message: Message):
+	#словарь с idшниками фото
+	photos_db = fetch_photo_kurs()
 	photos = photos_db['3']
 	await message.answer(attachment = photos)
 
 #ответ на нажатие на кнопку "курс 4"
 @bot.on.message(payload = {'cmd': 'kurs4'})
 async def answerer_kurs4(message: Message):
+	#словарь с idшниками фото
+	photos_db = fetch_photo_kurs()
 	photos = photos_db['4']
 	await message.answer(attachment = photos)
 	#код ниже это бекап такой
@@ -247,7 +255,7 @@ async def mailing_handler(message: Message):
 	user = await bot.api.users.get(message.from_id)
 	user_id = user[0].id
 	random_number = random.randint(1, 900000000)
-	if user_id == 188529333:
+	if user_id == 188529333 or user_id == 461222890:
 		try:
 			#получаю информацию о пользователях, пользующихся ботом
 			users_info = fetchall()
@@ -261,15 +269,23 @@ async def mailing_handler(message: Message):
 				user_topics = fetch_topics(user_id)
 				for user_topic in user_topics:
 					if user_topic == topics[0]:
+						#словарь с idшниками фото
+						photos_db = fetch_photo_kurs()
 						photos = photos_db['1']
 						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
 					if user_topic == topics[1]:
+						#словарь с idшниками фото
+						photos_db = fetch_photo_kurs()
 						photos = photos_db['2']
 						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
 					if user_topic == topics[2]:
+						#словарь с idшниками фото
+						photos_db = fetch_photo_kurs()
 						photos = photos_db['3']
 						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)
 					if user_topic == topics[3]:
+						#словарь с idшниками фото
+						photos_db = fetch_photo_kurs()
 						photos = photos_db['4']
 						await bot.api.messages.send(user_id = user_id, attachment = photos, message = 'Рассылка!', random_id = random_number)							
 		except Exception as ex:
@@ -284,14 +300,15 @@ async def photo_upload(message: Message):
 	#получаю id пользователя
 	user = await bot.api.users.get(message.from_id)
 	user_id = user[0].id
-	if user_id == 188529333:
-		kurs1 = file_finder(1, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-		kurs2 = file_finder(2, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-		kurs3 = file_finder(3, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
-		kurs4 = file_finder(4, 'C:\\Users\\Vladik\\Downloads\\photo_files\\*')
+	if user_id == 188529333 or user_id == 461222890:
+		kurs1 = file_finder(1, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
+		kurs2 = file_finder(2, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
+		kurs3 = file_finder(3, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
+		kurs4 = file_finder(4, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
 		kurses = [kurs1, kurs2, kurs3, kurs4]
 		kurs_dict = {}
 		photos = []
+		delete_photos()
 		for kurs in kurses:
 			try:
 				kurs_number = kurses.index(kurs) + 1
