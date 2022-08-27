@@ -1,4 +1,4 @@
-import glob
+import glob2, os
 import sqlite3 as sql
 from mailing_db import file_finder
 

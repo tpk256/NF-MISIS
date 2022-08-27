@@ -1,5 +1,5 @@
 import sqlite3 as sql
-import glob
+import glob2, os
 
 TOPIC_TRANSLATOR = {
 		'topic1': 'первого',
@@ -189,8 +189,14 @@ def fetch_topics(user_id):
 	return topics
 
 #функция-поиск файлов
-def file_finder(kurs_number, path):
-	files = glob.glob(path)
+def file_finder(kurs_number):
+	path = os.path.abspath('photo_files/*')
+	print('\n')
+	print(path)
+	print('\n')
+	files = glob2.glob(path)
+	print('\n')
+	print(f'Файлы: {files}')
 	kurs = []
 	path2 = path.rstrip('*')
 	for file in files:

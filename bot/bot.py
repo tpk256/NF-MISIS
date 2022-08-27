@@ -1,11 +1,11 @@
 from auth_data import token, token_old
-import asyncio, glob
+import asyncio, glob2
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, OpenLink, Location, EMPTY_KEYBOARD, API, PhotoMessageUploader
 from typing import Tuple
 from mailing_db import *
 from photo_server_upload import *
-import random
+import random, os
 
 #авторизация
 bot = Bot(token = token)
@@ -301,11 +301,14 @@ async def photo_upload(message: Message):
 	user = await bot.api.users.get(message.from_id)
 	user_id = user[0].id
 	if user_id == 188529333 or user_id == 461222890:
-		kurs1 = file_finder(1, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
-		kurs2 = file_finder(2, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
-		kurs3 = file_finder(3, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
-		kurs4 = file_finder(4, '\\home\\kravasos\\new_vk_bot\\photo_files\\*')
+		kurs1 = file_finder(1)
+		kurs2 = file_finder(2)
+		kurs3 = file_finder(3)
+		kurs4 = file_finder(4)
 		kurses = [kurs1, kurs2, kurs3, kurs4]
+		print('\n')
+		print(kurses)
+		print('\n')
 		kurs_dict = {}
 		photos = []
 		delete_photos()
