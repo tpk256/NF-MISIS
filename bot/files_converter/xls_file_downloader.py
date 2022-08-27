@@ -60,28 +60,28 @@ try:
 	#скачивание excel файлов с расписанием
 	#первый курс
 	try:
-		k1 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[25]/a[1]")
+		k1 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[14]/a[1]")
 		k1.click()
 		time.sleep(1)
 	except:
 		print('не могу найти расписание для первого курса')
 	#второй курс
 	try:
-		k2 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[26]/a[1]")
+		k2 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[15]/a[1]")
 		k2.click()
 		time.sleep(1)
 	except:
 		print('не могу найти расписание для второго курса')
 	#третий курс
 	try:
-		k3 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[27]/a[1]")
+		k3 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[16]/a[1]")
 		k3.click()
 		time.sleep(1)
 	except:
 		print('не могу найти расписание для третьего курса')
 	#четвёртый курс
 	try:
-		k4 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[28]/a[1]")
+		k4 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[17]/a[1]")
 		k4.click()
 		time.sleep(1)
 	except:

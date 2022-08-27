@@ -1,2 +1,2 @@
-login = 'БПИ-18'
-password = 64802
+login = 'БПИ-21'
+password = 'paskal9'

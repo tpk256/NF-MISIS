@@ -35,7 +35,7 @@ def jpg_renamer():
 	#переименовываю фото
 	path = 'C:\\Users\\Vladik\\Downloads\\photo_files\\'
 	for file in jpg_files:
-		photo_number = file.split('\\')[-1][:-4][-2:]
-		kurs = file.split('\\')[-1][:-4][:2]
-		new_filename = path + f'{kurs}_{photo_number}.jpg'
+		photo_number = file.split('\\')[-1][:-4][-1:]
+		kurs = file.split('\\')[-1][:-4][:1]
+		new_filename = path + f'KURS{kurs} ({photo_number}).jpg'
 		os.rename(file, new_filename)
