@@ -26,7 +26,7 @@ photo_upd = PhotoMessageUploader(bot.api)
 async def keyboard_menu(message: Message):
 	#получаю id пользователя
 	user = await bot.api.users.get(message.from_id)
-	user_id = user[0].id
+	user_id = message.from_id
 	#добавляю пользователя в бд
 	upload_user(user_id)
 	#Меню
@@ -58,15 +58,21 @@ async def keyboard_timetable(message: Message):
 
 #ответ на нажатие на кнопку "рассылка"
 @bot.on.message(payload = {'cmd': 'mailing'})
-async def mailing_menu(message = Message):
+async def mailing_menu(message: Message):
 	#создаю клавиатуру
 	mailing_menu_keyboard = Keyboard()
-	mailing_menu_keyboard.add(Text('Подписаться', {'cmd': 'mailing_subscribe'}))
-	mailing_menu_keyboard.add(Text('Отписаться', {'cmd': 'mailing_unsubscribe'}))
-	mailing_menu_keyboard.row()
-	mailing_menu_keyboard.add(Text('Назад', {'cmd': 'menu'}), color = KeyboardButtonColor.PRIMARY)
+	mailing_menu_keyboard.add(Text('Назад', {'cmd': 'menu'}), color=KeyboardButtonColor.PRIMARY)
+	mailing_menu_keyboard = mailing_menu_keyboard.get_json()
+	await message.answer('Данный функционал пока недоступен, так как переходим на telegram, по всем вопросам https://t.me/uuuuwxj',
+						 keyboard=mailing_menu_keyboard)
+	return
 
-	await message.answer('Вы хотите подписаться на рассылку или отписаться от рассылки?', keyboard = mailing_menu_keyboard)
+	# mailing_menu_keyboard.add(Text('Подписаться', {'cmd': 'mailing_subscribe'}))
+	# mailing_menu_keyboard.add(Text('Отписаться', {'cmd': 'mailing_unsubscribe'}))
+	# mailing_menu_keyboard.row()
+	#
+
+	# await message.answer('Вы хотите подписаться на рассылку или отписаться от рассылки?', keyboard = mailing_menu_keyboard)
 
 #ответ на нажатие на кнопку "подписаться"
 @bot.on.message(payload = {'cmd': 'mailing_subscribe'})
@@ -201,6 +207,7 @@ async def author(message: Message):
 #ответ на нажатие на кнопку "курс 1"
 @bot.on.message(payload = {'cmd': 'kurs1'})
 async def answerer_kurs1(message: Message):
+	print("Типа робит")
 	#словарь с idшниками фото
 	photos_db = fetch_photo_kurs()
 	photos = photos_db['1']
@@ -252,10 +259,10 @@ async def mailing_handler(message: Message):
 	#кортеж топиков
 	topics = ('topic1;', 'topic2;', 'topic3;', 'topic4;')
 	#получаю id пользователя
-	user = await bot.api.users.get(message.from_id)
-	user_id = user[0].id
+	user = await bot.api.users.get()
+	user_id = message.from_id
 	random_number = random.randint(1, 900000000)
-	if user_id == 188529333 or user_id == 461222890:
+	if user_id == 188529333 or user_id == 461222890 or user_id == 682160714:
 		try:
 			#получаю информацию о пользователях, пользующихся ботом
 			users_info = fetchall()
@@ -298,9 +305,9 @@ async def mailing_handler(message: Message):
 @bot.on.message(text = '/photos')
 async def photo_upload(message: Message):
 	#получаю id пользователя
-	user = await bot.api.users.get(message.from_id)
-	user_id = user[0].id
-	if user_id == 188529333 or user_id == 461222890:
+
+	user_id = message.from_id
+	if user_id == 188529333 or user_id == 461222890 or user_id == 682160714:
 		kurs1 = file_finder(1)
 		kurs2 = file_finder(2)
 		kurs3 = file_finder(3)

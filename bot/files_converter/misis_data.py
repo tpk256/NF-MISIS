@@ -1,2 +1,2 @@
-login = 'БПИ-21'
-password = 'paskal9'
+login = 'Student'
+password = 'Student-2025'

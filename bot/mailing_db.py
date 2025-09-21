@@ -190,7 +190,7 @@ def fetch_topics(user_id):
 
 #функция-поиск файлов
 def file_finder(kurs_number):
-	path = os.path.abspath('photo_files/*')
+	path = r"C:\Users\tpk25\Downloads\photo_files\*"
 	print('\n')
 	print(path)
 	print('\n')

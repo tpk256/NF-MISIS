@@ -23,7 +23,6 @@ options.add_argument('--disable-blink-features=AutomationControlled')
 
 #создание класса Chrome(), можно использовать другие браузеры, но придётся поменять код
 driver = webdriver.Chrome(
-	executable_path = 'chromedriver\\chromedriver.exe',
 	options = options
 )
 
@@ -40,27 +39,23 @@ try:
 	login_input.send_keys(login)
 	time.sleep(1)
 	#ввод пароля
-	password_input = driver.find_element(By.CLASS_NAME, 'validate-password')
+	password_input = driver.find_element(By.ID, 'password')
 	password_input.clear()
 	password_input.send_keys(password)
 	time.sleep(1)
 	#подтверждение(нажимаем на клавишу 'login')
 	password_input.send_keys(Keys.ENTER)
-	time.sleep(1)
+	time.sleep(5)
 
-	#переход на вкладку "расписание"
-	raspisanie = driver.find_element(By.CLASS_NAME, 'item-1102')
-	raspisanie.click()
-	time.sleep(1)
+
 	#переход на вкладку "очного расписания"
-	o_raspisanie = driver.find_element(By.CLASS_NAME, 'col-md-4').find_element(By.LINK_TEXT, 'Расписание для студентов очной формы обучения')
-	o_raspisanie.click()
+	driver.get('https://nf.misis.ru/schedule/ochnaya-forma')
 	time.sleep(1)
 
 	#скачивание excel файлов с расписанием
 	#первый курс
 	try:
-		k1 = driver.find_element(By.XPATH, "//div[@class='art-article']/p[14]/a[1]")
+		k1 = driver.find_element(By.XPATH, "//div[contains(@class, 'uk-panel') and contains(@class, 'uk-margin')]/p[14]/a[1]")
 		k1.click()
 		time.sleep(1)
 	except:
